@@ -5,7 +5,7 @@
 		"mir-core": "0.2.2",
 		"optional": "0.16.0",
 		"silly": "1.0.2",
-		"spasm": {"path":"../wasm-ldc"},
+		"spasm": {"path":"../spasm"},
 		"stdx-allocator": "3.1.0-beta.2",
 		"unit-threaded": "0.10.7"
 	}

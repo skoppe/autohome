@@ -188,18 +188,23 @@ template matchFirst(alias fun) {
   }
 }
 
-@styleset!(ItemStyles)
+struct NodeHeader {
+  @style!"text-black" @style!"text-lg" @style!"font-bold" mixin Node!"div";
+  @prop string textContent;
+}
+
+// @styleset!(ItemStyles)
 struct NodeItem {
   nothrow:
-  @style!"table" mixin Node!"table";
-  @prop string textContent;
-  @child List!(Value,"tr") list;
+  @style!"m-4" @style!"bg-white" @style!"rounded" @style!"shadow-lg" @style!"p-4" mixin Node!"div";
+  @child NodeHeader header;
+  @style!"w-full" @child List!(Value,"table") list;
   ZWaveNode* zwaveNode;
   WebSocket* socket;
   this(ZWaveNode* zwaveNode, WebSocket* socket) {
     this.zwaveNode = zwaveNode;
     this.socket = socket;
-    textContent = zwaveNode.productName;
+    header.textContent = zwaveNode.productName;
   }
   void onValueAdded(ref ZWaveValue zwaveValue) @trusted {
     auto rest = list.items[].skipUntil!((scope ref i) => i.valueId == zwaveValue.id);
@@ -244,7 +249,8 @@ template notifyChildren(string name) {
 
 struct App {
   nothrow:
-  @child Omnibox omnibox;
+  @style!"bg-gray-100" @style!"min-h-full" mixin Node!"div";
+  // @child Omnibox omnibox;
   @(param.socket!socket)
   @child DevicesTab devicesTab;
   WebSocket socket;
@@ -424,16 +430,26 @@ auto getAllocator() @trusted {
   return allocator;
 }
 
-@styleset!(ItemStyles)
+enum receiverNode = "16817852562488164000";
+
+// @styleset!(ItemStyles)
 struct DevicesTab {
   nothrow:
-  @style!"item" @child List!(NodeItem,"div") list;
+  @style!"flex" @child List!(NodeItem,"div") list;
   WebSocket* socket;
   void onNodeAdded(ZWaveNode* node) {
+    console.log(node.productName);
+    if (node.productName != "EUR_SPIRITZ Wall Radiator Thermostat" &&
+        node.productName != "SSR 303 Thermostat Receiver")
+      return;
     if (!list.items[].canFind!(i => i.zwaveNode.nodeId == node.nodeId))
       list.put(getAllocator.make!(NodeItem)(node, socket));
   }
   void onValueAdded(ref ZWaveValue value) {
+    // if (value.id != "47865462784")
+    //   return;
+    if (value.label != "Air Temperature" && value.label != "Switch")
+      return;
     list.items[]
       .find!(i => i.zwaveNode.nodeId == value.nodeId)
       .take(1)

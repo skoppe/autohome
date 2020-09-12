@@ -4,7 +4,7 @@ authors "Sebastiaan Koppe"
 copyright "Copyright © 2019, Sebastiaan Koppe"
 license "MIT"
 #dependency "spasm" version="~>0.2.0-beta.5"
-dependency "spasm" path="../wasm-ldc"
+dependency "spasm" path="../spasm"
 buildRequirements "allowWarnings"
 
 configuration "executable" {
